@@ -56,13 +56,4 @@ func create_corridor(from: Vector2, to: Vector2, room_coords : Array):
 		tilemap.set_cell(x, y1, 1)
 	for y in range(min(y1, y2), max(y1, y2) + 1):
 		tilemap.set_cell(x2, y, 1)
-	check_surroundings(Vector2(0,0), room_coords)
 
-
-func check_surroundings(point : Vector2, room_coords : Array):
-	var path_cell_locations = tilemap.get_used_cells_by_id(1)
-	
-	for room in room_coords: # removes the room cell positions from the array to isolate the path cell positions
-		for x in range(10):
-			for y in range(10):
-				path_cell_locations.erase(Vector2(room.x+x, room.y+y))
