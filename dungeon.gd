@@ -3,6 +3,7 @@ extends Node2D
 
 export var level = 0
 onready var tilemap = $TileMap
+onready var player_scene = preload("res://player.tscn")
 
 
 func _ready():
@@ -15,9 +16,9 @@ func _ready():
 func generate_dungeon(grid_size : Vector2, room_num : int):
 	var room_coords = []
 	var room_centers = []
+	var room_size = Vector2(10,10)
 	
 	for _i in range(room_num): # generates rooms
-		var room_size = Vector2(10,10)
 		var room_starting_point
 		
 		while true:
@@ -42,6 +43,8 @@ func generate_dungeon(grid_size : Vector2, room_num : int):
 		
 	for i in range(1, room_centers.size()): # generates corridors
 		create_corridor(room_centers[i-1], room_centers[i], room_coords)
+	
+	place_entities(room_centers)
 
 
 func create_corridor(from: Vector2, to: Vector2, room_coords : Array):
@@ -57,3 +60,20 @@ func create_corridor(from: Vector2, to: Vector2, room_coords : Array):
 	for y in range(min(y1, y2), max(y1, y2) + 1):
 		tilemap.set_cell(x2, y, 1)
 
+
+func place_entities(room_list : Array):
+	var taken_positions = []
+	# picks a random place for the door to go
+	var door_position = room_list.pick_random()
+	taken_positions.append(tilemap.map_to_world(door_position))
+	tilemap.set_cellv(door_position, 2)
+	
+	while true:
+		var player_instance = player_scene.instance()
+		add_child(player_instance)
+		var player_pos = tilemap.map_to_world(room_list.pick_random())
+		if !taken_positions.has(player_pos):
+			player_instance.position += player_pos
+			break
+		else:
+			player_instance.queue_free()
